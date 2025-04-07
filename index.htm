@@ -2,50 +2,30 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Campanha da Mãe Rainha</title>
   <style>
     body {
-      background-color: #0d1b2a;
-      color: #e0e1dd;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
       margin: 20px;
     }
 
-    h1, h2 {
-      color: #e0e1dd;
-    }
-
-    h1 svg {
-      vertical-align: middle;
-      margin-right: 10px;
+    h2 {
+      margin-top: 40px;
     }
 
     label {
       display: block;
       margin-top: 10px;
-      color: #cbd5e0;
     }
 
-    select, input[type="text"], button {
+    select,
+    input[type="text"],
+    button {
       margin-top: 5px;
-      padding: 8px;
+      padding: 5px;
       width: 100%;
       max-width: 300px;
-      border: none;
-      border-radius: 4px;
-      background-color: #1b263b;
-      color: #e0e1dd;
-    }
-
-    button {
-      background-color: #415a77;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background-color: #778da9;
     }
 
     table {
@@ -54,38 +34,26 @@
       margin-top: 20px;
     }
 
-    th, td {
-      border: 1px solid #415a77;
-      padding: 10px;
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: left;
     }
 
     th {
-      background-color: #1b263b;
-    }
-
-    tr:nth-child(even) {
-      background-color: #0d1b2a;
-    }
-
-    tr:nth-child(odd) {
-      background-color: #1b263b;
+      background-color: #f4f4f4;
     }
 
     .container {
-      max-width: 700px;
-      margin: auto;
+      max-width: 600px;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="#e0e1dd" height="32" viewBox="0 0 24 24" width="32">
-        <path d="M12 2L6 8v14h12V8l-6-6zm0 2.828L16 9v11h-3v-5H11v5H8V9l4-4.172z"/>
-      </svg>
-      Sistema da Campanha da Mãe Rainha
-    </h1>
+    <h1>Sistema da Campanha da Mãe Rainha</h1>
 
     <h2>Cadastro de Participantes (Administrador)</h2>
     <form id="cadastro-form">
@@ -105,6 +73,7 @@
       <label for="dia-ideal">Dia ideal (1 a 31):</label>
       <select id="dia-ideal">
         <option value="">Selecione um dia</option>
+        <!-- Dias de 1 a 31 serão adicionados via JS -->
       </select>
 
       <button type="submit">Cadastrar morador</button>
@@ -115,7 +84,9 @@
       <label for="morador-recebimento">Selecione seu nome:</label>
       <select id="morador-recebimento">
         <option value="">Selecione um morador</option>
+        <!-- Moradores cadastrados serão adicionados aqui -->
       </select>
+
       <button type="submit">RECEBIDO</button>
     </form>
 
@@ -129,7 +100,9 @@
           <th>Data de Recebimento</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody>
+        <!-- Registros serão inseridos aqui -->
+      </tbody>
     </table>
   </div>
 
@@ -140,11 +113,7 @@
     const historicoTable = document.querySelector('#historico tbody');
     const selectDiaIdeal = document.getElementById('dia-ideal');
 
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbxP7RJh2lb5qs_nKCEcmvfoIyQ__rcbdaSOWZG1QhUfGqH5lL86gZsqMA2UUnvu3wul/exec";
-
-    let moradores = [];
-    let historico = [];
-
+    // Popula o campo "dia ideal" com opções de 1 a 31
     for (let i = 1; i <= 31; i++) {
       const option = document.createElement('option');
       option.value = i;
@@ -152,11 +121,16 @@
       selectDiaIdeal.appendChild(option);
     }
 
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbxP7RJh2lb5qs_nKCEcmvfoIyQ__rcbdaSOWZG1QhUfGqH5lL86gZsqMA2UUnvu3wul/exec"; // Substitua pelo seu URL real
+
+    let moradores = [];
+    let historico = [];
+
     cadastroForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      const nome = document.getElementById('nome').value.trim();
-      const apartamento = document.getElementById('apartamento').value.trim();
+      const nome = document.getElementById('nome').value;
+      const apartamento = document.getElementById('apartamento').value;
       const bloco = document.getElementById('bloco').value;
       const diaIdeal = document.getElementById('dia-ideal').value;
 
