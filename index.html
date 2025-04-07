@@ -135,4 +135,97 @@
     const historicoTable = document.querySelector('#historico tbody');
     const selectDiaIdeal = document.getElementById('dia-ideal');
 
-    for (
+    for (let i = 1; i <= 31; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = i;
+      selectDiaIdeal.appendChild(option);
+    }
+
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbwjSNz22PkG_n8yiNRnkW36MdeG83TMpIwsIig1HNMobyXVZbWuuc_ibALP94BgVhWd/exec";
+
+    let moradores = [];
+
+    async function carregarMoradores() {
+      try {
+        const response = await fetch(`${webAppUrl}?acao=cadastrados`);
+        const data = await response.json();
+
+        moradores = data;
+
+        selectMorador.innerHTML = `<option value="">Selecione um morador</option>`;
+        moradores.forEach(morador => {
+          const option = document.createElement('option');
+          option.value = morador.nome;
+          option.textContent = morador.nome;
+          selectMorador.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar moradores:", error);
+      }
+    }
+
+    carregarMoradores();
+
+    cadastroForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value;
+      const apartamento = document.getElementById('apartamento').value;
+      const bloco = document.getElementById('bloco').value;
+      const diaIdeal = document.getElementById('dia-ideal').value;
+
+      const morador = { nome, apartamento, bloco, diaIdeal };
+
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ acao: 'cadastrar', ...morador })
+      });
+
+      moradores.push(morador);
+
+      const option = document.createElement('option');
+      option.value = nome;
+      option.textContent = nome;
+      selectMorador.appendChild(option);
+
+      cadastroForm.reset();
+    });
+
+    recebimentoForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const nome = selectMorador.value;
+      if (!nome) return;
+
+      const morador = moradores.find(m => m.nome === nome);
+      const data = new Date().toLocaleDateString('pt-BR');
+
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          acao: 'registrar',
+          nome: morador.nome,
+          apartamento: morador.apartamento,
+          bloco: morador.bloco
+        })
+      });
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${morador.nome}</td>
+        <td>${morador.apartamento}</td>
+        <td>${morador.bloco}</td>
+        <td>${data}</td>
+      `;
+      historicoTable.appendChild(row);
+
+      recebimentoForm.reset();
+    });
+  </script>
+</body>
+</html>
