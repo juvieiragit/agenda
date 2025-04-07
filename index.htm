@@ -29,4 +29,189 @@
 
     select, input[type="text"], button {
       margin-top: 5px;
-      padding
+      padding: 8px;
+      width: 100%;
+      max-width: 300px;
+      border: none;
+      border-radius: 4px;
+      background-color: #1b263b;
+      color: #e0e1dd;
+    }
+
+    button {
+      background-color: #415a77;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #778da9;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #415a77;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #1b263b;
+    }
+
+    tr:nth-child(even) {
+      background-color: #0d1b2a;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #1b263b;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="#e0e1dd" height="32" viewBox="0 0 24 24" width="32">
+        <path d="M12 2L6 8v14h12V8l-6-6zm0 2.828L16 9v11h-3v-5H11v5H8V9l4-4.172z"/>
+      </svg>
+      Sistema da Campanha da Mãe Rainha
+    </h1>
+
+    <h2>Cadastro de Participantes (Administrador)</h2>
+    <form id="cadastro-form">
+      <label for="nome">Nome do morador:</label>
+      <input type="text" id="nome" required />
+
+      <label for="apartamento">Número do apartamento:</label>
+      <input type="text" id="apartamento" required />
+
+      <label for="bloco">Bloco:</label>
+      <select id="bloco">
+        <option value="">Selecione o bloco</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+      </select>
+
+      <label for="dia-ideal">Dia ideal (1 a 31):</label>
+      <select id="dia-ideal">
+        <option value="">Selecione um dia</option>
+      </select>
+
+      <button type="submit">Cadastrar morador</button>
+    </form>
+
+    <h2>Registro de Recebimento</h2>
+    <form id="recebimento-form">
+      <label for="morador-recebimento">Selecione seu nome:</label>
+      <select id="morador-recebimento">
+        <option value="">Selecione um morador</option>
+      </select>
+      <button type="submit">RECEBIDO</button>
+    </form>
+
+    <h2>Histórico de Posse</h2>
+    <table id="historico">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Apartamento</th>
+          <th>Bloco</th>
+          <th>Data de Recebimento</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const cadastroForm = document.getElementById('cadastro-form');
+    const recebimentoForm = document.getElementById('recebimento-form');
+    const selectMorador = document.getElementById('morador-recebimento');
+    const historicoTable = document.querySelector('#historico tbody');
+    const selectDiaIdeal = document.getElementById('dia-ideal');
+
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbxP7RJh2lb5qs_nKCEcmvfoIyQ__rcbdaSOWZG1QhUfGqH5lL86gZsqMA2UUnvu3wul/exec";
+
+    let moradores = [];
+    let historico = [];
+
+    for (let i = 1; i <= 31; i++) {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = i;
+      selectDiaIdeal.appendChild(option);
+    }
+
+    cadastroForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const apartamento = document.getElementById('apartamento').value.trim();
+      const bloco = document.getElementById('bloco').value;
+      const diaIdeal = document.getElementById('dia-ideal').value;
+
+      const morador = { nome, apartamento, bloco, diaIdeal };
+
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ acao: 'cadastrar', ...morador })
+      });
+
+      moradores.push(morador);
+
+      const option = document.createElement('option');
+      option.value = nome;
+      option.textContent = nome;
+      selectMorador.appendChild(option);
+
+      cadastroForm.reset();
+    });
+
+    recebimentoForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const nome = selectMorador.value;
+      if (!nome) return;
+
+      const morador = moradores.find(m => m.nome === nome);
+      const data = new Date().toLocaleDateString('pt-BR');
+      historico.push({ ...morador, data });
+
+      fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          acao: 'registrar',
+          nome: morador.nome,
+          apartamento: morador.apartamento,
+          bloco: morador.bloco
+        })
+      });
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${morador.nome}</td>
+        <td>${morador.apartamento}</td>
+        <td>${morador.bloco}</td>
+        <td>${data}</td>
+      `;
+      historicoTable.appendChild(row);
+
+      recebimentoForm.reset();
+    });
+  </script>
+</body>
+</html>
