@@ -8,15 +8,6 @@
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      background-color: #0b1f3a;
-      color: #ffffff;
-    }
-
-    h1 {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
     }
 
     h2 {
@@ -35,14 +26,6 @@
       padding: 5px;
       width: 100%;
       max-width: 300px;
-      background-color: #142c4a;
-      color: #ffffff;
-      border: 1px solid #2e4a72;
-    }
-
-    button:hover {
-      background-color: #1a3b60;
-      cursor: pointer;
     }
 
     table {
@@ -59,7 +42,7 @@
     }
 
     th {
-      background-color: #1e3a5f;
+      background-color: #f4f4f4;
     }
 
     .container {
@@ -70,12 +53,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>
-      <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M32 2 L42 12 H52 V54 H12 V12 H22 L32 2 Z M24 54 V36 H40 V54" stroke="white" stroke-width="2" fill="none"/>
-      </svg>
-      Sistema da Campanha da Mãe Rainha
-    </h1>
+    <h1>Sistema da Campanha da Mãe Rainha</h1>
 
     <h2>Cadastro de Participantes (Administrador)</h2>
     <form id="cadastro-form">
@@ -135,6 +113,7 @@
     const historicoTable = document.querySelector('#historico tbody');
     const selectDiaIdeal = document.getElementById('dia-ideal');
 
+    // Popula o campo "dia ideal" com opções de 1 a 31
     for (let i = 1; i <= 31; i++) {
       const option = document.createElement('option');
       option.value = i;
@@ -142,30 +121,10 @@
       selectDiaIdeal.appendChild(option);
     }
 
-    const webAppUrl = "https://script.google.com/macros/s/AKfycbwjSNz22PkG_n8yiNRnkW36MdeG83TMpIwsIig1HNMobyXVZbWuuc_ibALP94BgVhWd/exec";
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbxP7RJh2lb5qs_nKCEcmvfoIyQ__rcbdaSOWZG1QhUfGqH5lL86gZsqMA2UUnvu3wul/exec"; // Substitua pelo seu URL real
 
     let moradores = [];
-
-    async function carregarMoradores() {
-      try {
-        const response = await fetch(`${webAppUrl}?acao=cadastrados`);
-        const data = await response.json();
-
-        moradores = data;
-
-        selectMorador.innerHTML = `<option value="">Selecione um morador</option>`;
-        moradores.forEach(morador => {
-          const option = document.createElement('option');
-          option.value = morador.nome;
-          option.textContent = morador.nome;
-          selectMorador.appendChild(option);
-        });
-      } catch (error) {
-        console.error("Erro ao carregar moradores:", error);
-      }
-    }
-
-    carregarMoradores();
+    let historico = [];
 
     cadastroForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -202,6 +161,7 @@
 
       const morador = moradores.find(m => m.nome === nome);
       const data = new Date().toLocaleDateString('pt-BR');
+      historico.push({ ...morador, data });
 
       fetch(webAppUrl, {
         method: 'POST',
